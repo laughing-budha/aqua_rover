@@ -80,19 +80,28 @@ void loop()
 
 
 // Read data from the GPS module
-//   while (gpsSerial.available()) {
-//     if (gps.encode(gpsSerial.read())) {
-//       // If a GPS sentence is parsed successfully
-//       if (gps.location.isValid()) {
-//         // If location data is valid
-//         Serial.print("Latitude: ");
-//         Serial.print(gps.location.lat(), 6);
-//         Serial.println();
-//         Serial.print("Longitude: ");
-//         Serial.print(gps.location.lng(), 6);
-//         Serial.println();
+  while (gpsSerial.available()) {
+    if (gps.encode(gpsSerial.read())) {
+      // If a GPS sentence is parsed successfully
+      if (gps.location.isValid()) {
+        // If location data is valid
+        Serial.print("Latitude: ");
+        Serial.print(gps.location.lat(), 6);
+        Serial.println();
+        Serial.print("Longitude: ");
+        Serial.print(gps.location.lng(), 6);
+        Serial.println();
+      }
+    }
+  }
 
+  double targetLatitude = 9.591567;
+  double targetLongitude = 76.522156;
 
+  double distanceToTarget = gps.distanceBetween(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
+  double bearingToTarget = gps.courseTo(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
+
+  while (distanceToTarget > 5) { 
 
   ScanSurrounding();
   while(1)
@@ -160,8 +169,12 @@ void loop()
   
 }
 
+Serial.println("Target Reached!");
 
+distanceToTarget = gps.distanceBetween(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
+bearingToTarget = gps.courseTo(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
 
+}
 
 void ScanSurrounding(void)
 {
