@@ -1,4 +1,3 @@
-
 // Header Files ----------------------------------------------------------------
 
 #include <SoftwareSerial.h>
@@ -7,6 +6,7 @@
 
 
 //Pin Setup -------------------------------------------------------------------
+
 const int gpsRX = 0; 
 const int gpsTX = 1; // software serial communication with the GPS module
 
@@ -32,6 +32,7 @@ TinyGPSPlus gps; // TinyGPSPlus object
 
 
 // Functions ------------------------------------------------------------------
+
 long obstacle_0,obstacle_90,obstacle_180;  // abstacle at 0-deg, 90-deg, 180-deg respectively.
 void Reverse(void);             //Reverse()
 void Right(void);               //Right() Direction
@@ -44,6 +45,7 @@ void ScanSurrounding(void);     // look for obstacle
 
 
 //Setup File ------------------------------------------------------------------
+
 void setup() {
   
   Serial.begin(115200);          //Serial communication reference
