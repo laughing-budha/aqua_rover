@@ -3,6 +3,7 @@
 #include <SoftwareSerial.h>
 #include <TinyGPSPlus.h>   // Header file for GPS Module.
 #include <Servo.h>    // Header file for Servo Motor.
+#include <Adafruit_HMC5883_U.h>
 
 
 //Pin Setup -------------------------------------------------------------------
@@ -29,6 +30,7 @@ const int gpsTX = 1; // software serial communication with the GPS module
 Servo myservo;        // Object for servo motor
 SoftwareSerial gpsSerial(gpsRX, gpsTX); // Software serial object to communicate with the GPS module
 TinyGPSPlus gps; // TinyGPSPlus object
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);  //Compass Object
 
 
 // Functions ------------------------------------------------------------------
@@ -50,6 +52,12 @@ void setup() {
   
   Serial.begin(115200);          //Serial communication reference
   gpsSerial.begin(115200); // Start serial communication with GPS module
+  if(!mag.begin())
+    {
+      /* There was a problem detecting the HMC5883 ... check your connections */
+      Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
+      while(1);
+    }
 
   pinMode(motor11, OUTPUT);    //L298 Pin mode assigning
   pinMode(motor12, OUTPUT);
@@ -68,7 +76,7 @@ void setup() {
   delay(50);              // signal processing delay
   myservo.write(90);      // Move servo at 90 deg
   delay(2000);
-
+  
  
 
 }
@@ -80,7 +88,7 @@ void loop()
 
 
 // Read data from the GPS module
-  while (gpsSerial.available()) {
+  if (gpsSerial.available()) {
     if (gps.encode(gpsSerial.read())) {
       // If a GPS sentence is parsed successfully
       if (gps.location.isValid()) {
@@ -100,6 +108,18 @@ void loop()
 
   double distanceToTarget = gps.distanceBetween(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
   double bearingToTarget = gps.courseTo(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
+  
+  sensors_event_t event; 
+        mag.getEvent(&event);
+
+        // Calculate heading (raw values may need scaling)
+        double heading = atan2(event.magnetic.y, event.magnetic.x);
+
+        // Normalize to 0-360 degrees: 
+        float headingDegrees = heading * 180/M_PI; 
+        Serial.println(heading);
+
+        delay(500);
 
   while (distanceToTarget > 5) { 
 
@@ -175,6 +195,7 @@ distanceToTarget = gps.distanceBetween(gps.location.lat(), gps.location.lng(), t
 bearingToTarget = gps.courseTo(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
 
 }
+
 
 void ScanSurrounding(void)
 {
