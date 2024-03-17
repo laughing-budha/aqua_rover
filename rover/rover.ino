@@ -71,7 +71,7 @@ void loop()
       Disable_Motor(); 
       Reverse();
       Enable_Motor();
-      Delay(50);  
+      delay(50);  
       Disable_Motor();
     } 
     else if( (obstacle_0 > obstacle_180) && (obstacle_0 > 100)    ) 
@@ -110,7 +110,7 @@ void loop()
         Left();
       }
       Enable_Motor();
-      delay(500);
+      delay(350);
       Disable_Motor();
     }
     ScanSurrounding(); 
