@@ -15,7 +15,11 @@ Servo myservo;
 
 
 #define echo  6              
-#define Trigg 5             
+#define Trigg 5   
+#define echo2  4              
+#define Trigg2 3    
+#define echo3  2              
+#define Trigg3 1              
 
 long obstacle_0,obstacle_90,obstacle_180;  
 void Reverse(void);             
@@ -29,7 +33,7 @@ void ScanSurrounding(void);
 
 void setup() {
   
-  Serial.begin(115200);          
+  Serial.begin(9600);          
   pinMode(motor11, OUTPUT);    
   pinMode(motor12, OUTPUT);
 
@@ -41,6 +45,10 @@ void setup() {
 
   pinMode(echo, INPUT);        
   pinMode(Trigg, OUTPUT);
+  pinMode(echo2, INPUT);        
+  pinMode(Trigg2, OUTPUT);
+  pinMode(echo3, INPUT);        
+  pinMode(Trigg3, OUTPUT);
 
   Serial.println(" Obstacle detector Robot is about to start ");
   myservo.attach(2);      
@@ -56,14 +64,14 @@ void loop()
   ScanSurrounding();
   while(1)
   {   
-    if(obstacle_90 > 150)     
+    if(obstacle_90 > 150 && Read_Brake_sensor_Value())     
     { 
       Serial.println(" No obstacle detected at 90 deg  ");
       myservo.write(90);
       delay(500);
       Forward();
       Enable_Motor();
-      while(obstacle_90 > 80)    
+      while(obstacle_90 > 80 && Read_Brake_sensor_Value())    
       {
         obstacle_90 = Read_Ultrasonic_sensor_Value();
         Enable_Motor();
@@ -139,7 +147,42 @@ void ScanSurrounding(void)
   obstacle_180 = Read_Ultrasonic_sensor_Value();
 }
 
-
+bool Read_Brake_sensor_Value(void)     
+{
+  long dist1=0;
+  digitalWrite(Trigg2, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trigg2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trigg2, LOW);
+  dist1 = (pulseIn(echo2, HIGH)/ 10);
+  long dist2=0;
+  digitalWrite(Trigg3, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trigg3, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trigg3, LOW);
+  dist2 = (pulseIn(echo3, HIGH)/ 10);
+  if (dist1 > 170)           
+  {
+    dist1 = 170;
+  }
+  if (dist2 > 170)           
+  {
+    dist2 = 170;
+  }
+  Serial.print("brake 1 Distance is  --> ");
+  Serial.println(dist1); 
+  Serial.print("brake 2 Distance is  --> ");
+  Serial.println(dist2);   
+  // delay(1000);
+  if(dist1<80 || dist2 <80){
+    return false;
+  }
+  else{
+    return true;
+  }
+}
 
 
 

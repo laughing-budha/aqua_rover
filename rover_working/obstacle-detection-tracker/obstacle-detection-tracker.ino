@@ -8,8 +8,8 @@
 
 //Pin Setup -------------------------------------------------------------------
 
-const int gpsRX = 0; 
-const int gpsTX = 1; // software serial communication with the GPS module
+const int gpsRX = 2; 
+const int gpsTX = 3; // software serial communication with the GPS module
 
 #define motor11 9             //Right Motor pins
 #define motor12 8
@@ -50,8 +50,8 @@ void ScanSurrounding(void);     // look for obstacle
 
 void setup() {
   
-  Serial.begin(115200);          //Serial communication reference
-  gpsSerial.begin(115200); // Start serial communication with GPS module
+  Serial.begin(9600);          //Serial communication reference
+  gpsSerial.begin(9600); // Start serial communication with GPS module
   if(!mag.begin())
     {
       /* There was a problem detecting the HMC5883 ... check your connections */
@@ -82,7 +82,12 @@ void setup() {
 }
 
 // Loop File ---------------------------------------------------------------------------
-
+int degToDelay(int degrees, int refDeg = 90, int refDelay = 500) {
+  if (degrees <= 0 || refDeg <= 0 || refDelay <= 0) {
+    return 0; // Handle invalid inputs
+  }
+  return degrees * refDelay / refDeg;
+}
 void loop() 
 {
 
@@ -108,20 +113,30 @@ void loop()
 
   double distanceToTarget = gps.distanceBetween(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
   double bearingToTarget = gps.courseTo(gps.location.lat(), gps.location.lng(), targetLatitude, targetLongitude);
+  Serial.print("distanceTotarget --->");Serial.println(distanceToTarget);
+  Serial.print("bearingTotarget --->");Serial.println(bearingToTarget);
+  Serial.print("Latitude: ");
+        Serial.print(gps.location.lat(), 6);
+        Serial.println();
+        Serial.print("Longitude: ");
+        Serial.print(gps.location.lng(), 6);
+  delay(2000);
   
-  sensors_event_t event; 
-        mag.getEvent(&event);
+  // sensors_event_t event; 
+  //       mag.getEvent(&event);
 
-        // Calculate heading (raw values may need scaling)
-        double heading = atan2(event.magnetic.y, event.magnetic.x);
+  //       // Calculate heading (raw values may need scaling)
+  //       double heading = atan2(event.magnetic.y, event.magnetic.x);
 
-        // Normalize to 0-360 degrees: 
-        float headingDegrees = heading * 180/M_PI; 
-        Serial.println(heading);
+  //       // Normalize to 0-360 degrees: 
+  //       float headingDegrees = heading * 180/M_PI; 
+  //       Serial.println(heading);
 
-        delay(500);
+  //       delay(500);
 
-  while (distanceToTarget > 5) { 
+  //  while (distanceToTarget > 5) { 
+    while(0){ // comment and uncomment above code when working compas module is bought
+   
 
   ScanSurrounding();
   while(1)
